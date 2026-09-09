@@ -68,18 +68,15 @@ bot.catch((err, ctx) => {
 bot.launch();
 logger.info('🤖 KinoBot ishga tushdi');
 
-// ------- Health-check HTTP server -------
-// Render (va shunga o'xshash hostinglar) "Web Service" turidagi joylashtirishlarni
-// faqat biror portni tinglagan (HTTP so'rovlarga javob bergan) taqdirdagina "sog'lom"
-// deb hisoblaydi va uni uxlab qolishdan saqlash uchun tashqi "ping" xizmati
-// (masalan UptimeRobot yoki cron-job.org) shu manzilga so'rov yuborib turadi.
-// Bot o'zi Telegram bilan polling orqali ishlaydi — bu server faqat "men tirikman"
-// deb javob berish uchun kerak, botning asosiy logikasiga aloqasi yo'q.
+// ------- Render (yoki boshqa hosting) uchun "sun'iy" web server -------
+// Render'ning bepul "Web Service" rejasi ishlashi uchun ilova biror portni
+// tinglashi shart. Bot o'zi HTTP so'rovlarini qabul qilmaydi, shuning uchun
+// faqat "tirikligini" ko'rsatish uchun minimal server ochamiz.
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.status(200).send('KinoBot ishlab turibdi ✅');
+  res.send('KinoBot ishlayapti ✅');
 });
 
 app.listen(PORT, () => {
