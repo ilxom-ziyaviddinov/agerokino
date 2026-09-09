@@ -2,6 +2,7 @@
 // Bu yerda faqat: commands/handlers/keyboardlarni ulash bor.
 // Har bir bo'limning ICHKI logikasi alohida faylларда (commands/, handlers/).
 
+const express = require('express');
 const bot = require('../config/bot');
 const logger = require('../utils/logger');
 
@@ -66,6 +67,24 @@ bot.catch((err, ctx) => {
 
 bot.launch();
 logger.info('🤖 KinoBot ishga tushdi');
+
+// ------- Health-check HTTP server -------
+// Render (va shunga o'xshash hostinglar) "Web Service" turidagi joylashtirishlarni
+// faqat biror portni tinglagan (HTTP so'rovlarga javob bergan) taqdirdagina "sog'lom"
+// deb hisoblaydi va uni uxlab qolishdan saqlash uchun tashqi "ping" xizmati
+// (masalan UptimeRobot yoki cron-job.org) shu manzilga so'rov yuborib turadi.
+// Bot o'zi Telegram bilan polling orqali ishlaydi — bu server faqat "men tirikman"
+// deb javob berish uchun kerak, botning asosiy logikasiga aloqasi yo'q.
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.status(200).send('KinoBot ishlab turibdi ✅');
+});
+
+app.listen(PORT, () => {
+  logger.info(`🌐 Health-check server ${PORT}-portda ishga tushdi`);
+});
 
 // Botni to'g'ri to'xtatish (Ctrl+C bosilganda)
 process.once('SIGINT', () => bot.stop('SIGINT'));
