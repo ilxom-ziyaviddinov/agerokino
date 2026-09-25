@@ -56,7 +56,7 @@ bot.hears(
 
 // ------- Boshqa barcha matn xabarlar (qidiruv oqimi shu yerda ishlaydi) -------
 bot.on('text', textHandler);
-bot.on('photo', handleAdminWizardPhoto);
+bot.on(['photo', 'document'], handleAdminWizardPhoto);
 
 // ------- Global xatolarni ushlash -------
 // Bot foydalanuvchiga texnik xato (Error 500, TypeError...) ko'rsatmaydi.

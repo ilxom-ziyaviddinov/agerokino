@@ -106,6 +106,10 @@ async function handleAdminWizardText(ctx) {
 
 /**
  * Wizard rasm (photo) xabarini qayta ishlaydi — poster yuklash bosqichi.
+ * Rasm Telegram orqali oddiy rasm (photo) yoki "fayl sifatida" (document,
+ * masalan Telegram Desktop'da "Compression" o'chirilgan bo'lsa) yuborilishi
+ * mumkin — ikkalasini ham qabul qilamiz, aks holda wizard poster kutgan
+ * holatda "osilib" qoladi va admin uchun kino qo'shish ishlamayotgandek tuyuladi.
  * @returns {boolean} true bo'lsa — xabar shu yerda "ishlatildi"
  */
 async function handleAdminWizardPhoto(ctx) {
@@ -117,10 +121,25 @@ async function handleAdminWizardPhoto(ctx) {
   if (wizard.mode !== 'add_await_poster' && wizard.mode !== 'edit_field') return false;
 
   const photos = ctx.message.photo;
-  if (!photos || photos.length === 0) return false;
+  const document = ctx.message.document;
+  const isImageDocument = document && document.mime_type && document.mime_type.startsWith('image/');
 
-  // Eng sifatli (oxirgi, eng katta o'lchamli) versiyasini olamiz.
-  const fileId = photos[photos.length - 1].file_id;
+  let fileId;
+  if (photos && photos.length > 0) {
+    // Eng sifatli (oxirgi, eng katta o'lchamli) versiyasini olamiz.
+    fileId = photos[photos.length - 1].file_id;
+  } else if (isImageDocument) {
+    fileId = document.file_id;
+  } else {
+    // Wizard rasm kutmoqda, lekin rasm bo'lmagan fayl (masalan video yoki hujjat) kelsa —
+    // jim o'tkazib yubormasdan, aniq xabar beramiz.
+    if (wizard.mode === 'add_await_poster' || (wizard.mode === 'edit_field' && wizard.field === 'poster_url')) {
+      await ctx.reply('🖼 Iltimos, rasm yuboring (rasm yoki rasm fayli sifatida).');
+      return true;
+    }
+    return false;
+  }
+
   const fileLink = await ctx.telegram.getFileLink(fileId);
   const posterUrl = fileLink.href;
 

@@ -194,6 +194,10 @@ function registerAdminCallbacks(bot) {
     }
 
     const updated = await movieService.setPublished(movieId, !movie.is_published);
+    if (!updated) {
+      await ctx.answerCbQuery('😕 Holatni o\'zgartirishda xatolik yuz berdi.', { show_alert: true });
+      return;
+    }
     await ctx.answerCbQuery(updated.is_published ? '🟢 Ko\'rsatilmoqda' : '⚪️ Yashirildi');
 
     const caption =
