@@ -74,6 +74,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Ichki server xatosi yuz berdi.' });
 });
 
-app.listen(PORT, () => {
-  logger.info(`🖥️  Server http://localhost:${PORT} portida ishga tushdi`);
-});
+// Faqat shu fayl to'g'ridan-to'g'ri ishga tushirilganda (masalan `npm run server:start`
+// yoki `npm run server:dev` orqali, lokal rivojlantirishda) portni o'zi tinglaydi.
+// `bot/bot.js` esa bu ilovani import qilib, o'zi bitta umumiy portda ishga tushiradi —
+// shunda bitta Render xizmatida ham bot, ham admin panel birga ishlaydi.
+if (require.main === module) {
+  app.listen(PORT, () => {
+    logger.info(`🖥️  Server http://localhost:${PORT} portida ishga tushdi`);
+  });
+}
+
+module.exports = app;

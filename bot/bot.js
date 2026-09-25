@@ -2,7 +2,6 @@
 // Bu yerda faqat: commands/handlers/keyboardlarni ulash bor.
 // Har bir bo'limning ICHKI logikasi alohida faylларда (commands/, handlers/).
 
-const express = require('express');
 const bot = require('../config/bot');
 const logger = require('../utils/logger');
 
@@ -68,19 +67,17 @@ bot.catch((err, ctx) => {
 bot.launch();
 logger.info('🤖 KinoBot ishga tushdi');
 
-// ------- Render (yoki boshqa hosting) uchun "sun'iy" web server -------
+// ------- Admin panel + API serverini ham shu jarayonda ishga tushiramiz -------
 // Render'ning bepul "Web Service" rejasi ishlashi uchun ilova biror portni
 // tinglashi shart. Bot o'zi HTTP so'rovlarini qabul qilmaydi, shuning uchun
-// faqat "tirikligini" ko'rsatish uchun minimal server ochamiz.
-const app = express();
+// alohida "soxta" server ochish o'rniga, admin panelning haqiqiy Express
+// ilovasini (server/server.js) shu yerga ulaymiz — natijada bitta xizmatda
+// ham bot, ham to'liq admin panel (login, /api/... va h.k.) ishlaydi.
+const adminApp = require('../server/server');
 const PORT = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
-  res.send('KinoBot ishlayapti ✅');
-});
-
-app.listen(PORT, () => {
-  logger.info(`🌐 Health-check server ${PORT}-portda ishga tushdi`);
+adminApp.listen(PORT, () => {
+  logger.info(`🌐 Admin panel + API ${PORT}-portda ishga tushdi`);
 });
 
 // Botni to'g'ri to'xtatish (Ctrl+C bosilganda)
